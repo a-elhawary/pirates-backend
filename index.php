@@ -36,73 +36,17 @@ $router->post("/register", function(){
     $eventModel = new Model("register",$fields);
     $read = $eventModel->getAll();
     
-    
     $columnArray  = array_column($read, 'Email');
-    
-    $emptyFirstName = false;
-    $emptyLastName = false;
-    $emptyEmail = false;
-    $emptyPassword = false;
-    $emptyRole = false;
-    $emptyPhoneNumber = false;
-    $emptyGender = false;
-    $emptyDOB = false;
-    $emptyUniversity = false;
-    $emptyFaculty = false;
 
     $isValidated = true;
     $Repeat = false;
 
 
-    if(empty($_POST['FirstName'])){  
-        $emptyUser = true;
-        $isValidated = false;
-        echo "Please enter FirstName!\n";
-      }
-    if(empty($_POST['LastName'])){
-        $emptyPass = true;
-        $isValidated = false;
-        echo "Please enter LastName!\n";
-    }
-    if(empty($_POST['Email'])){  
-        $emptyUser = true;
-        $isValidated = false;
-        echo "Please enter Email!\n";
-      }
-    if(empty($_POST['Password'])){
-        $emptyPass = true;
-        $isValidated = false;
-        echo "Please enter Password!\n";
-    }
-    if(empty($_POST['Role'])){  
-        $emptyUser = true;
-        $isValidated = false;
-        echo "Please enter your Role!\n";
-      }
-    if(empty($_POST['PhoneNumber'])){
-        $emptyPass = true;
-        $isValidated = false;
-        echo "Please enter PhoneNumber!\n";
-    }
-    if(empty($_POST['Gender'])){  
-        $emptyUser = true;
-        $isValidated = false;
-        echo "Please enter your Gender!\n";
-      }
-    if(empty($_POST['DOB'])){
-        $emptyPass = true;
-        $isValidated = false;
-        echo "Please enter DOB!\n";
-    }
-    if(empty($_POST['University'])){  
-        $emptyUser = true;
-        $isValidated = false;
-        echo "Please enter your University!\n";
-      }
-    if(empty($_POST['Faculty'])){
-        $emptyPass = true;
-        $isValidated = false;
-        echo "Please enter Faculty!\n";
+    foreach ($_POST as $key => $value) {
+        if(empty($value)){
+            echo "The field ". "(".$key.")"." can't be empty! <br>";
+            $isValidated = false;
+        }
     }
 
     if(in_array($_POST['Email'],$columnArray)){
