@@ -2,6 +2,8 @@
 require_once("Helpers/Router.php");
 require_once("Models/Model.php");
 require_once("Validator.php");
+require_once("Models/users.php");
+require_once("Models/event.php");
 
 
 $base = "";
@@ -22,8 +24,7 @@ $router->post("/events", function(){
 	$isValid  = validate();
 	
 	if($isValid){
-		$fields  = array("ID", "Name", "Description","Location","Image","Date","isShown","isAdmitting");
-		$eventModel = new Model("events",$fields);
+		$eventModel = new event();
 		$eventModel->insert($_POST);
 	}
 
@@ -32,8 +33,7 @@ $router->post("/events", function(){
 });
 
 $router->post("/register", function(){
-	$fields  = array("FirstName", "LastName", "Email", "Password", "Role", "PhoneNumber", "Gender", "DOB", "University", "Faculty");
-    $eventModel = new Model("register",$fields);
+    $eventModel = new users();
     $read = $eventModel->getAll();
     
     $columnArray  = array_column($read, 'Email');
@@ -63,7 +63,7 @@ $router->post("/register", function(){
 
 $router->post("/login", function(){
     $fields  = array("FirstName", "LastName", "Email", "Password", "Role", "PhoneNumber", "Gender", "DOB", "University", "Faculty");
-    $eventModel = new Model("register",$fields);
+    $eventModel = new Model("users",$fields);
     $read = $eventModel->getAll();
     
     $EmailColumn  = array_column($read, 'Email');
