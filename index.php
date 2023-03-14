@@ -9,10 +9,9 @@ require_once("Models/event.php");
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: *');
 
-if(file_get_contents('php://input') != NULL){
 $_POST = json_decode(file_get_contents('php://input'));
 $_POST = convert_object_to_array($_POST);
-}
+
 
 
 

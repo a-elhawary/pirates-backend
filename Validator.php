@@ -39,8 +39,8 @@ function isValidDateEvent(){
 function isValidDateBirth(){
     $isValidated = true;
 
-    $eventDate = $_POST["Date"];
-    if(isValidDateForm($eventDate)){ // check if the time entered is valid 
+    $eventDate = $_POST["DOB"];
+    if(isValidDateForm($eventDate,"Y-m-d")){ // check if the time entered is valid 
         $date_now = date("Y-m-d");
         if ($date_now < $eventDate) { //check if the time entered is in the future
             echo "You're born in the future?";
@@ -95,22 +95,19 @@ function validateEvent(){
 
  function validateLogin(){
 
+    $isValidated = true;
+
     $UserModel = new users();
     $read = $UserModel->getAll();
     $EmailColumn  = array_column($read, 'Email');
     
    
-    if(empty($_POST['Email'])){  
-        echo "Please enter Email!";
-      }
-    if(empty($_POST['Password'])){
-        echo "Please enter Password!";
-    }
+    $isValidated = isEmpty();
 
-    if(!in_array($_POST['Email'],$EmailColumn)){
+    if(!in_array($_POST['Email'],$EmailColumn) && $isValidated){
         echo "Email doesn't exist!";
     }
-    else{
+    elseif($isValidated){
             $i =0;
             for($i;$i<count($read);$i++){
                 if($read[$i]['Email'] ==$_POST['Email']){
