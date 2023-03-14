@@ -1,40 +1,29 @@
 <?php
 
 
-
-
-/**
- * Validates date(or date time) format
- * @param $date
- * @param string $format
- * @return bool
- */
-function isValidDate(string $date, string $format = 'Y-m-d H:i:s'): bool
+function isValidDateForm(string $date, string $format = 'Y-m-d H:i:s'): bool
 {
     $dateObj = DateTime::createFromFormat($format, $date);
     return $dateObj && $dateObj->format($format) == $date;
 }
 
-function validate(){
-    
-
+function isEmpty(){
     $isValidated = true;
-
-    //check if there is any empty field
     foreach ($_POST as $key => $value) {
         if(empty($value)){
             echo "The field ". "(".$key.")"." can't be empty! <br>";
-            $isValidated = false;
         }
     }
+    return $isValidated;
+}
+
+function isValidDateEvent(){
+    $isValidated = true;
 
     $eventDate = $_POST["Date"];
-    if(isValidDate($eventDate)){ // check if the time entered is valid 
-
+    if(isValidDateForm($eventDate)){ // check if the time entered is valid 
         $date_now = date("Y-m-d H:i:s");
-        if ($date_now < $eventDate) { //check if the time entered is in the future
-            // do Nothing
-        }else{
+        if ($date_now >= $eventDate) { //check if the time entered is in the future
             echo "The Date entered have already passed!";
             $isValidated = false;
         }
@@ -43,9 +32,98 @@ function validate(){
         echo "Date format entered is false!";
         $isValidated = false;
     }
-
     return $isValidated;
 
+}
+
+function isValidDateBirth(){
+    $isValidated = true;
+
+    $eventDate = $_POST["Date"];
+    if(isValidDateForm($eventDate)){ // check if the time entered is valid 
+        $date_now = date("Y-m-d");
+        if ($date_now < $eventDate) { //check if the time entered is in the future
+            echo "You're born in the future?";
+            $isValidated = false;
+        }
+    }
+    else{
+        echo "Date format entered is false!";
+        $isValidated = false;
+    }
+    return $isValidated;
+
+}
+
+
+function validateEvent(){
+
+    $isValidated = true;
+    $eventModel = new event();
+    
+    $isValidated = isEmpty();
+    $isValidated = isValidDateEvent();
+
+    if($isValidated){
+        $eventModel->insert($_POST);
+    }
+
+ }
+ function validateRegister(){
+
+    $UserModel = new users();
+    $read = $UserModel->getAll();
+    $columnArray  = array_column($read, 'Email');
+
+
+    $isValidated = true;
+
+    $isValidated = isEmpty();
+    $isValidated = isValidDateBirth();
+
+    if(in_array($_POST['Email'],$columnArray)){
+
+        $isValidated = false;
+        echo "Email already exists!\n";
+    }
+
+    if($isValidated){
+        $UserModel->insert($_POST);
+    }
+
+ }
+
+ function validateLogin(){
+
+    $UserModel = new users();
+    $read = $UserModel->getAll();
+    $EmailColumn  = array_column($read, 'Email');
+    
+   
+    if(empty($_POST['Email'])){  
+        echo "Please enter Email!";
+      }
+    if(empty($_POST['Password'])){
+        echo "Please enter Password!";
+    }
+
+    if(!in_array($_POST['Email'],$EmailColumn)){
+        echo "Email doesn't exist!";
+    }
+    else{
+            $i =0;
+            for($i;$i<count($read);$i++){
+                if($read[$i]['Email'] ==$_POST['Email']){
+                    if($read[$i]['Password']==$_POST['Password']){
+                        echo "Success";
+                    }
+                    else{
+                        echo "Wrong Password";
+                    }
+                }
+            }
+
+    }
  }
 
 
