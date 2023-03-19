@@ -22,15 +22,19 @@ $router = new Router($base);
 
 
 
+$router->get("/about", function(){
+	echo "<h1>About US</h1>";
+});
+
+
+$router->post("/addevents", function(){
+    validateEvent();
+});
+
 $router->get("/events", function(){
     $eventModel = new event();
     echo json_encode($eventModel->getAll());
 
-});
-
-
-$router->post("/events", function(){
-    validateEvent();
 });
 
 $router->post("/register", function(){
