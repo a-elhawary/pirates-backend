@@ -39,8 +39,9 @@ class Router{
 		$match = true;
 		$variables = [];
 		// if same size check each "folder"
-		if(!empty($route[0][0])){
+		
 			for($i = 0; $i < count($route); $i++){
+				if(!empty($route[$i])){
 				if($route[$i][0] === "{"){
 					$key = ltrim($route[$i], "{");
 					$key = rtrim($key, "}");
@@ -51,7 +52,8 @@ class Router{
 					return ["flag"=>false];
 				}
 			}
-		}
+			}
+		
 		$variables["flag"] = true;
 		return $variables;
 	}

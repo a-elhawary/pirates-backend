@@ -21,7 +21,6 @@ $base = "";
 $router = new Router($base);
 
 
-
 $router->get("/about", function(){
 	echo "<h1>About US</h1>";
 });
@@ -30,6 +29,7 @@ $router->get("/about", function(){
 $router->post("/addevents", function(){
     validateEvent();
 });
+
 
 $router->get("/events", function(){
     $eventModel = new event();
