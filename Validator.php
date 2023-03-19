@@ -19,10 +19,10 @@ function isEmpty(){
 
 function isValidDateEvent(){
     $isValidated = true;
-
+    $date_now = date("Y-m-d\TH:i");
     $eventDate = $_POST["Date"];
-    if(isValidDateForm($eventDate)){ // check if the time entered is valid 
-        $date_now = date("Y-m-d H:i:s");
+    if(isValidDateForm($eventDate,"Y-m-d\TH:i")){ // check if the time entered is valid 
+        $date_now = date("Y-m-d\TH:i:s");
         if ($date_now >= $eventDate) { //check if the time entered is in the future
             echo "The Date entered have already passed!";
             $isValidated = false;

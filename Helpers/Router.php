@@ -39,15 +39,17 @@ class Router{
 		$match = true;
 		$variables = [];
 		// if same size check each "folder"
-		for($i = 0; $i < count($route); $i++){
-			if($route[$i][0] === "{"){
-				$key = ltrim($route[$i], "{");
-				$key = rtrim($key, "}");
-				$variables[$key] = $currentRoute[$i];
-				continue;
-			}
-			if($route[$i] != $currentRoute[$i]){
-				return ["flag"=>false];
+		if(!empty($route[0][0])){
+			for($i = 0; $i < count($route); $i++){
+				if($route[$i][0] === "{"){
+					$key = ltrim($route[$i], "{");
+					$key = rtrim($key, "}");
+					$variables[$key] = $currentRoute[$i];
+					continue;
+				}
+				if($route[$i] != $currentRoute[$i]){
+					return ["flag"=>false];
+				}
 			}
 		}
 		$variables["flag"] = true;
