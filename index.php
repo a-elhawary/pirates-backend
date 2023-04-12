@@ -2,6 +2,7 @@
 require_once("Helpers/Router.php");
 require_once("Helpers/helpers.php");
 require_once("Models/Model.php");
+require_once("Models/slots.php");
 require_once("Validator.php");
 require_once("Models/users.php");
 require_once("Models/event.php");
@@ -43,6 +44,10 @@ $router->post("/register", function(){
 
 $router->post("/login", function(){
     validateLogin();
+});
+
+$router->post("/AddInterviewSlot", function(){
+    validateSlot();
 });
 
 $router->route();

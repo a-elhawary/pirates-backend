@@ -123,5 +123,26 @@ function validateEvent(){
     }
  }
 
+ function validateSlot(){
+    $isValidated = true;
+
+    $SlotModel = new slots();
+    $read = $SlotModel->getBy("AdminEmail",$_POST['AdminEmail']);
+
+    $isValidated = isEmpty();
+    if(count($read)!=0  && $isValidated ){
+        for($i;$i<count($read);$i++){
+            if(strcmp($read[$i]['Date'],$_POST['Date']) == 0 &&
+            strcmp(substr($read[$i]['StartTime'],0,-3),$_POST['StartTime']) == 0  &&
+            strcmp(substr($read[$i]['EndTime'],0,-3),$_POST['EndTime']) == 0 ){
+                        $isValidated = false;
+                    }
+            }
+    }
+    if($isValidated){
+        $SlotModel->insert($_POST);
+    }
+}
+
 
 ?>
