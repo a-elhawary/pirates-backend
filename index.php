@@ -22,10 +22,14 @@ $base = "";
 $router = new Router($base);
 
 
-$router->get("/about", function(){
-	echo "<h1>About US</h1>";
+$router->get("/about/{id}", function($args){
+	echo "Event ".$args["id"];
 });
 
+$router->get("/event/{event}", function($args){
+	$eventModel = new event();
+    echo json_encode($eventModel->getBy("Name",$args["event"]));
+});
 
 $router->post("/addevents", function(){
     validateEvent();
