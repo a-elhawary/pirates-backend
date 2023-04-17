@@ -28,7 +28,7 @@ $router->get("/about", function(){
 
 $router->get("/event/{event}", function($args){
 	$eventModel = new event();
-    echo json_encode($eventModel->getBy("Name",$args["event"]));
+    echo json_encode($eventModel->getBy("Name",str_replace("%20"," ",$args["event"])));
 });
 
 $router->post("/addevents", function(){
