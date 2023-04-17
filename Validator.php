@@ -70,7 +70,8 @@ function validateEvent(){
 
  }
  function validateRegister(){
-
+    $_POST['Role'] = "user";
+    unset($_POST['ConfirmPassword']);
     $UserModel = new users();
     $read = $UserModel->getAll();
     $columnArray  = array_column($read, 'Email');
