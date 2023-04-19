@@ -145,5 +145,50 @@ function validateEvent(){
     }
 }
 
+function validateFileName($filename, $desiredContent) {
+    return ((bool) ((preg_match($desiredContent, $filename)) ? true : false) && (bool) ((mb_strlen($filename,"UTF-8") <= 200) ? true : false));
+}
+function validateFileType($fileType, $allowedTypes){
+    return in_array($fileType, $allowedTypes);
+}
+function UploadEventRegister($dir,$files){
+    $target_dir = $dir;
+    $files = $files;
+    $success = true;
+    $message = '';
+    $validFiles = array();
+    foreach ($files as $file) {
+        $desiredContent = "`^[-0-9a-zA-Z_\. ()]+$`i";
+        $validName = validateFileName($_FILES[$file]['name'],$desiredContent);
+        $allowedTypes = array('image/jpeg', 'image/png', 'image/jpg');
+        $validType = validateFileType($_FILES[$file]['type'], $allowedTypes);
+        if ($validName && $validType) {
+            array_push($validFiles, $file);
+        } else {
+            if (!$validName){
+                $message .= 'Error uploading file ' . $_FILES[$file]['name'] . '. Invalid Name or more than 200 characters.' . '<br>';
+            }
+            if (!$validType){
+                $message .= 'Error uploading file ' . $_FILES[$file]['name'] . '. Invalid Type, please upload jpg/jpeg/png photos.' . '<br>';
+            }
+        }
+    }
+    if (count($validFiles) == count($files)) {
+        foreach ($validFiles as $file) {
+            $unique_id = time().mt_rand();
+            $target_file = $target_dir . $unique_id . '_' . basename($_FILES[$file]['name']);
+            $uploaded = move_uploaded_file($_FILES[$file]['tmp_name'], $target_file);
+            if ($uploaded) {
+                $message .= 'File ' . $_FILES[$file]['name'] . ' uploaded successfully.' . '<br>';
+            } else {
+                $message .= 'Error uploading file ' . $_FILES[$file]['name'] . '.<br>';
+            }
+        }
+    } else {
+        $success = false;
+    }
+    $response = array('success' => $success, 'message' => $message);
+    echo json_encode($response);
+}
 
 ?>

@@ -6,6 +6,7 @@ require_once("Models/slots.php");
 require_once("Validator.php");
 require_once("Models/users.php");
 require_once("Models/event.php");
+require_once("Models/eventPart.php");
 
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: *');
@@ -53,6 +54,19 @@ $router->post("/login", function(){
 
 $router->post("/AddInterviewSlot", function(){
     validateSlot();
+});
+
+$router->post("/EventRegistration", function(){
+    $eventModel = new eventPart();
+    $read = $eventModel->getAll();
+    $EmailColumn = array_column($read, 'Email');
+    $EventColumn = array_column($read, 'EventID');
+
+    //var_dump($_POST);
+    // $email = $_POST['email'];
+    // $eventID = $_POST['eventID'];
+    $files = ['imageUni', 'imageNat'];
+    UploadEventRegister("uploads/", $files);
 });
 
 $router->route();
