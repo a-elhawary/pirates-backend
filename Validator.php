@@ -71,6 +71,7 @@ function validateEvent(){
  }
  function validateRegister(){
     $_POST['Role'] = "user";
+    $_POST['Password'] = password_hash($_POST["Password"], PASSWORD_BCRYPT);
     unset($_POST['ConfirmPassword']);
     $UserModel = new users();
     $read = $UserModel->getAll();
@@ -83,7 +84,6 @@ function validateEvent(){
     $isValidated = isValidDateBirth();
 
     if(in_array($_POST['Email'],$columnArray)){
-
         $isValidated = false;
         echo "Email already exists!\n";
     }
@@ -92,57 +92,108 @@ function validateEvent(){
         $UserModel->insert($_POST);
     }
 
+
  }
 
  function validateLogin(){
 
-    $isValidated = true;
+    $response = [];
+    $response["success"] = false;
+    $response["message"] = "Login Successful";
 
     $UserModel = new users();
-    $read = $UserModel->getAll();
-    $EmailColumn  = array_column($read, 'Email');
-    
-   
-    $isValidated = isEmpty();
+    $read = $UserModel->getBy("Email", $_POST["Email"]);
 
-    if(!in_array($_POST['Email'],$EmailColumn) && $isValidated){
-        echo "Email doesn't exist!";
+    if(count($read) <= 0){
+        $response["message"] = "Email doesn't exist!";
     }
-    elseif($isValidated){
+    else{
             $i =0;
             for($i;$i<count($read);$i++){
                 if($read[$i]['Email'] ==$_POST['Email']){
-                    if($read[$i]['Password']==$_POST['Password']){
-                        echo "Success";
+                    if(password_verify($_POST['Password'],$read[$i]['Password'])){
+                        $response["success"] = true;
+                        $response["token"] = [];
+                        $response["token"]["id"] = $read[$i]["id"];
+                        $response["token"]["email"] = $read[$i]["Email"];
+                        $response["token"]["role"] = $read[$i]["Role"];
                     }
                     else{
-                        echo "Wrong Password";
+                        $response["message"] = "Wrong Password";
                     }
                 }
             }
 
     }
+    echo json_encode($response);
  }
 
- function validateSlot(){
-    $isValidated = true;
-
+ function addSingleSlot($data){
     $SlotModel = new slots();
-    $read = $SlotModel->getBy("AdminEmail",$_POST['AdminEmail']);
+    $read = $SlotModel->getBy("AdminEmail",$data["AdminEmail"]);
 
     $isValidated = isEmpty();
     if(count($read)!=0  && $isValidated ){
         for($i;$i<count($read);$i++){
-            if(strcmp($read[$i]['Date'],$_POST['Date']) == 0 &&
-            strcmp(substr($read[$i]['StartTime'],0,-3),$_POST['StartTime']) == 0  &&
-            strcmp(substr($read[$i]['EndTime'],0,-3),$_POST['EndTime']) == 0 ){
+            if(strcmp($read[$i]['Date'],$data['Date']) == 0 &&
+            strcmp(substr($read[$i]['StartTime'],0,-3),$data['StartTime']) == 0  &&
+            strcmp(substr($read[$i]['EndTime'],0,-3),$data['EndTime']) == 0 ){
                         $isValidated = false;
                     }
             }
     }
     if($isValidated){
-        $SlotModel->insert($_POST);
+        $SlotModel->insert($data);
     }
+ }
+
+ function timeToIntArr($time){
+    $timeStrings = explode(":",$time);
+    $timeArr = [];
+    for($i = 0; $i < count($timeStrings); $i++){
+        array_push($timeArr, intval($timeStrings[$i]));
+    }
+    return $timeArr;
+ }
+
+ function addMinsToIntArr(&$timeArr, $mins){
+    $timeArr[1] += $mins;
+    while($timeArr[1] > 59){
+        $timeArr[1] -= 60;
+        $timeArr[0] += 1;
+    }
+ }
+
+ function IntArrToTime($timeArr){
+    return $timeArr[0].":".$timeArr[1];
+ }
+
+ function validateSlot(){
+    $isValidated = true;
+
+    $userModel = new users();
+    $userData = $userModel->getBy("id", $_POST["AdminID"]);
+    if(count($userData) == 0){
+        echo "no user data";
+        die();
+    }
+    $data = [];
+    $data["AdminEmail"] = $userData[0]["Email"];
+    $data["EventID"] = $_POST["EventID"];
+    $data["Date"] = $_POST["Date"];
+    $currentTime = timeToIntArr($_POST["StartTime"]);
+    $stopTime = timeToIntArr($_POST["EndTime"]);
+    $count = 0;
+    while($currentTime[0] < $stopTime[0] || ($currentTime[0] == $stopTime[0] && $currentTime[1] < $stopTime[1])){
+        $data["StartTime"] = IntArrToTime($currentTime);
+        addMinsToIntArr($currentTime, $_POST["InterviewTime"]);
+        $data["EndTime"] = IntArrToTime($currentTime);
+        addSingleSlot($data);
+        $count++;
+    }
+    $repsonse = [];
+    $response["count"] = $count;
+    echo json_encode($response);
 }
 
 function validateFileName($filename, $desiredContent) {
@@ -174,16 +225,29 @@ function UploadEventRegister($dir,$files){
         }
     }
     if (count($validFiles) == count($files)) {
+        $data = [];
+        $data["Email"] = $_POST["email"];
+        $data["EventID"] = $_POST["eventID"];
+        $data["Status"] = 0;
+        $i = 0;
         foreach ($validFiles as $file) {
             $unique_id = time().mt_rand();
             $target_file = $target_dir . $unique_id . '_' . basename($_FILES[$file]['name']);
             $uploaded = move_uploaded_file($_FILES[$file]['tmp_name'], $target_file);
+            if($i == 0){
+                $data["university_id_img"]=$target_file;
+            }else{
+                $data["national_id_img"]=$target_file;
+            }
             if ($uploaded) {
                 $message .= 'File ' . $_FILES[$file]['name'] . ' uploaded successfully.' . '<br>';
             } else {
                 $message .= 'Error uploading file ' . $_FILES[$file]['name'] . '.<br>';
             }
+            $i++;
         }
+        $eventPart = new eventPart();
+        $eventPart->insert($data);
     } else {
         $success = false;
     }

@@ -1,4 +1,3 @@
-
 <?php 
      class slots extends Model{
         public function __construct(){

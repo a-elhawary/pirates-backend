@@ -1,5 +1,5 @@
 <?php
-require_once(dirname(__DIR__)."/Helpers/Connection.php");
+require_once(dirname(__DIR__)."/Helpers/connection.php");
 // a parent class for all models that handles pdo so that a new model can simply inherit from this class, set some attributes and get going
 class Model{
 	// filled from parent class and includes the table name of the model
@@ -46,6 +46,21 @@ class Model{
 		// run the query
 		$stmt = $this->pdo->prepare($query);
 		$stmt->execute($newRow);
+	}
+
+	public function update($col, $colValue, $by, $byValue){
+		$sql = "UPDATE ".$this->name." SET ".$col." = ? WHERE ".$by." = ?";
+		$stmt = $this->pdo->prepare($sql);
+		$data = [];
+		array_push($data, $colValue);
+		array_push($data, $byValue);
+		$stmt->execute($data);
+	}
+
+	public function runPreparedStatement($sql, $data){
+		$stmt = $this->pdo->prepare($sql);
+		$stmt->execute($data);
+		return $stmt->fetchAll();
 	}
 }
 ?>
