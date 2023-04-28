@@ -27,8 +27,6 @@ $router->get("/event/{event}", function($args){
 });
 
 $router->post("/addevents", function(){
-    $_POST = json_decode(file_get_contents('php://input'));
-    $_POST = convert_object_to_array($_POST);
     validateEvent();
 });
 
@@ -90,7 +88,7 @@ $router->get("/event/slotDays/{eventID}", function($args){
     $data = [];
     array_push($data, $args["eventID"]);
     $slots = new slots();
-    $data = $slots->runPreparedStatement("SELECT DISTINCT `Date` FROM slots WHERE EventID = ?", $data);
+    $data = $slots->runPreparedStatement("SELECT DISTINCT `Date` FROM slots WHERE EventID = ? ORDER BY `Date` ASC", $data);
     echo json_encode($data);
 });
 
@@ -99,7 +97,7 @@ $router->get("/event/slots/{eventID}/{date}", function($args){
     array_push($data, $args["date"]);
     array_push($data, $args["eventID"]);
     $slots = new slots();
-    $data = $slots->runPreparedStatement("SELECT * FROM slots WHERE `Date` = ? AND EventID = ?", $data);
+    $data = $slots->runPreparedStatement("SELECT * FROM slots WHERE `Date` = ? AND EventID = ? ORDER BY StartTime ASC", $data);
     echo json_encode($data);
 });
 
@@ -110,7 +108,7 @@ $router->get("/slotDays/{userId}", function($args){
     $data = [];
     array_push($data, $userData[0]["Email"]);
     $slots = new slots();
-    $data = $slots->runPreparedStatement("SELECT DISTINCT `Date` FROM slots WHERE AdminEmail = ?", $data);
+    $data = $slots->runPreparedStatement("SELECT DISTINCT `Date` FROM slots WHERE AdminEmail = ? ORDER BY `Date` ASC", $data);
     echo json_encode($data);
 });
 
@@ -122,7 +120,7 @@ $router->get("/slots/{userId}/{date}", function($args){
     if(count($userData) == 0) die();
     array_push($data, $userData[0]["Email"]);
     $slots = new slots();
-    $data = $slots->runPreparedStatement("SELECT * FROM slots WHERE `Date` = ? AND AdminEmail = ?", $data);
+    $data = $slots->runPreparedStatement("SELECT * FROM slots WHERE `Date` = ? AND AdminEmail = ? ORDER BY StartTime ASC", $data);
     echo json_encode($data);
 });
 

@@ -57,17 +57,24 @@ function isValidDateBirth(){
 
 
 function validateEvent(){
-
     $isValidated = true;
     $eventModel = new event();
     
     $isValidated = isEmpty();
     $isValidated = isValidDateEvent();
 
-    if($isValidated){
+    $desiredContent = "`^[-0-9a-zA-Z_\. ()]+$`i";
+    $validName = validateFileName($_FILES['Image']['name'],$desiredContent);
+    $allowedTypes = array('image/jpeg', 'image/png', 'image/jpg');
+    $validType = validateFileType($_FILES['Image']['type'], $allowedTypes);
+
+    if($isValidated && $validName && $validType){
+        $unique_id = time().mt_rand();
+        $target_file = __DIR__.'/uploads/events/'. $unique_id . '_' . basename($_FILES['Image']['name']);
+        $uploaded = move_uploaded_file($_FILES["Image"]['tmp_name'], $target_file);
+        $_POST["Image"] = substr($target_file, strlen(__DIR__.""));
         $eventModel->insert($_POST);
     }
-
  }
  function validateRegister(){
     $_POST['Role'] = "user";
@@ -235,9 +242,9 @@ function UploadEventRegister($dir,$files){
             $target_file = $target_dir . $unique_id . '_' . basename($_FILES[$file]['name']);
             $uploaded = move_uploaded_file($_FILES[$file]['tmp_name'], $target_file);
             if($i == 0){
-                $data["university_id_img"]=$target_file;
+                $data["university_id_img"]= substr($target_file, strlen(__DIR__.""));
             }else{
-                $data["national_id_img"]=$target_file;
+                $data["national_id_img"]= substr($target_file, strlen(__DIR__.""));
             }
             if ($uploaded) {
                 $message .= 'File ' . $_FILES[$file]['name'] . ' uploaded successfully.' . '<br>';
