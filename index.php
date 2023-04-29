@@ -13,7 +13,7 @@ require_once("Models/eventPart.php");
 
 
 
-$base = "/pirates-backend";
+$base = "";
 
 $router = new Router($base);
 
